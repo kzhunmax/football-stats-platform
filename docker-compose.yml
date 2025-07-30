@@ -21,6 +21,10 @@ services:
       # Redis connection properties
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+
+      # Jwt properties
+      JWT_SECRET_KEY: ${SECRET_KEY}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
     container_name: football-stats-backend
     ports:
       - "8080:8080"
