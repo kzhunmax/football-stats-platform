@@ -22,7 +22,7 @@ public class AuthService {
 
 
     @Transactional
-    public UserResponseDTO registerUser(UserRegistrationDTO  dto, String requestId) {
+    public UserResponseDTO registerUser(UserRegistrationDTO  dto) {
         userRegistrationValidator.validateRegistration(dto);
 
         User user = User.builder()
