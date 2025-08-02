@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.MDC;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,14 +19,16 @@ public class LoggingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String requestId = request.getHeader(REQUEST_ID_HEADER);
-            if (requestId == null || requestId.isEmpty()) {
-                requestId = UUID.randomUUID().toString();
-            }
+            String requestId = getOrCreateRequestId(request);
             MDC.put(REQUEST_ID_MDC_KEY, requestId);
             filterChain.doFilter(request, response);
         } finally {
             MDC.remove(REQUEST_ID_MDC_KEY);
         }
+    }
+
+    private String getOrCreateRequestId(HttpServletRequest request) {
+        String requestId = request.getHeader(REQUEST_ID_HEADER);
+        return (requestId != null && !requestId.isEmpty()) ? requestId : UUID.randomUUID().toString();
     }
 }

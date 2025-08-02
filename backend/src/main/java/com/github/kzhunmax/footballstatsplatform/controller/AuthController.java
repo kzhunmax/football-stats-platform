@@ -10,6 +10,7 @@ import com.github.kzhunmax.footballstatsplatform.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,17 +27,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
+
+    private static final String REQUEST_ID_MDC_KEY = "requestId";
+
     private final AuthService authService;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationManager authenticationManager;
-
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponseDTO>> registerUser(
             @Valid @RequestBody UserRegistrationDTO userRegistrationDTO) {
 
-        String requestId = UUID.randomUUID().toString();
+        String requestId = MDC.get(REQUEST_ID_MDC_KEY);
         log.info("Processing registration request | requestId={}, username={}", requestId, userRegistrationDTO.username());
 
         UserResponseDTO user = authService.registerUser(userRegistrationDTO);
@@ -46,7 +48,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<JwtResponse>> login(@Valid @RequestBody UserLoginDTO loginDto) {
-        String requestId = UUID.randomUUID().toString();
+        String requestId = MDC.get(REQUEST_ID_MDC_KEY);
         log.info("Login attempt | requestId={}, username={}", requestId, loginDto.usernameOrEmail());
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.usernameOrEmail());
